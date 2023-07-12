@@ -1,6 +1,7 @@
 import "./styles.css";
 import { useReducer, useState } from "react";
 import { Button, TextField } from "@mui/material";
+import usersData from './data';
 
 /** Instructions
    0. Fork this codesandbox and sync it with your github 
@@ -29,7 +30,16 @@ import { Button, TextField } from "@mui/material";
    5. Provide the link to your forked repo with your answers
    */
 
-function reducer(state, action) {
+interface IState {
+    count: number;
+}
+
+interface IAction {
+    type: string;
+}
+
+
+function reducer(state: IState, action: IAction) {
   switch (action.type) {
     case "increment":
       return { count: state.count + 1 };
@@ -41,9 +51,9 @@ function reducer(state, action) {
 }
 
 export default function App() {
-  const [users] = useState([]);
-  const [numberInput] = useState(0);
-  const [text] = useState("");
+  const [users] = useState<any[]>([]);
+  const [numberInput] = useState<number>(0);
+  const [text] = useState<string>("");
   const [countState, dispatch] = useReducer(reducer, { count: 0 });
 
   return (
