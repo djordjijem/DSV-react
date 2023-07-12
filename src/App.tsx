@@ -1,7 +1,9 @@
-import "./styles.css";
-import { useReducer, useState } from "react";
-import { Button, TextField } from "@mui/material";
+import './styles.css';
+import { useEffect, useReducer, useState } from 'react';
+import { Button, TextField } from '@mui/material';
 import usersData from './data';
+import { User } from './user.interface';
+import { makeId } from './utils';
 
 /** Instructions
    0. Fork this codesandbox and sync it with your github 
@@ -31,19 +33,18 @@ import usersData from './data';
    */
 
 interface IState {
-    count: number;
+  count: number;
 }
 
 interface IAction {
-    type: string;
+  type: string;
 }
-
 
 function reducer(state: IState, action: IAction) {
   switch (action.type) {
-    case "increment":
+    case 'increment':
       return { count: state.count + 1 };
-    case "decrement":
+    case 'decrement':
       return { count: state.count - 1 };
     default:
       throw new Error();
@@ -51,36 +52,49 @@ function reducer(state: IState, action: IAction) {
 }
 
 export default function App() {
-  const [users] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [numberInput] = useState<number>(0);
-  const [text] = useState<string>("");
+  const [text] = useState<string>('');
   const [countState, dispatch] = useReducer(reducer, { count: 0 });
+
+  useEffect(() => {
+    if (usersData && usersData.length > 0) {
+      const filteredUsers = usersData.filter((user) => user.age >= 18);
+      const mappedUsers = filteredUsers.map(({ username, address, age, company }) => ({
+        username,
+        address,
+        age,
+        companyName: company.name,
+      }));
+      const mappedUsersWithId = mappedUsers.map((user) => ({
+        ...user,
+        id: makeId(6, 'ABCDEF123456'),
+      }));
+      const sortedUsersByAge = [...mappedUsersWithId].sort((a, b) => a.age - b.age);
+      const sortedUsersByCompanyName = [...sortedUsersByAge].sort((a, b) => {
+        const companyA = a.companyName.toUpperCase();
+        const companyB = b.companyName.toUpperCase();
+        if (companyA < companyB) return -1;
+        if (companyA > companyB) return 1;
+        return 0;
+      });
+
+      setUsers(sortedUsersByCompanyName);
+    }
+  }, [usersData]);
 
   return (
     <div className="App">
       <p style={{ marginBottom: 0 }}>Count: {countState.count}</p>
-      <TextField
-        defaultValue={numberInput}
-        type="number"
-        style={{ display: "block" }}
-      />
-      <Button
-        variant="contained"
-        onClick={() => dispatch({ type: "decrement" })}
-      >
+      <TextField defaultValue={numberInput} type="number" style={{ display: 'block' }} />
+      <Button variant="contained" onClick={() => dispatch({ type: 'decrement' })}>
         -
       </Button>
-      <Button
-        variant="contained"
-        onClick={() => dispatch({ type: "increment" })}
-      >
+      <Button variant="contained" onClick={() => dispatch({ type: 'increment' })}>
         +
       </Button>
       <p style={{ marginBottom: 0, marginTop: 30 }}>Search for a user</p>
-      <TextField
-        defaultValue={text}
-        style={{ display: "block", margin: "auto" }}
-      />
+      <TextField defaultValue={text} style={{ display: 'block', margin: 'auto' }} />
     </div>
   );
 }
