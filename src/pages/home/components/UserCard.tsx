@@ -1,18 +1,28 @@
 import * as React from 'react';
-import { User } from '../../../interface/user.interface';
+import { IUser } from '../../../interface/user.interface';
 import { ActionButtonColor, ActionButtonSize, CustomCard } from '../../../components/CustomCard';
 
-export const UserCard: React.FC<{ user: User; onClick: (id: string) => void }> = ({
-  user: { age, username, companyName, address, id },
-  onClick,
+interface UserCardProps {
+  user: IUser;
+  onRemove: (id: string) => void;
+  hasRestoreButton?: boolean;
+  onRestore: (id: string) => void;
+}
+
+export const UserCard: React.FC<UserCardProps> = ({
+  user: { age, username, companyName, address, id, isRemoved },
+  onRemove,
+  onRestore,
 }) => {
   const actionsProps = {
     cardActionsClassName: 'user-card__card-actions',
     buttonClassName: 'user-card__card-actions__button',
     size: ActionButtonSize.S,
-    onClick: () => onClick(id),
+    onRemove: () => onRemove(id),
     color: ActionButtonColor.PR,
     text: 'remove',
+    hasRestoreButton: isRemoved,
+    onRestore: () => onRestore(id),
   };
 
   return (

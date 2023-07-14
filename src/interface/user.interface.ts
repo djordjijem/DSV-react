@@ -1,4 +1,4 @@
-export interface User {
+export interface IUser {
   id: string;
   username: string;
   age: number;
@@ -13,4 +13,5 @@ export interface User {
     };
   };
   companyName: string;
+  isRemoved?: boolean;
 }

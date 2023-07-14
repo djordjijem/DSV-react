@@ -26,10 +26,12 @@ interface ICustomCardProps {
   actionsProps: {
     cardActionsClassName?: string;
     buttonClassName?: string;
-    onClick: () => void;
+    onRemove: () => void;
+    onRestore: () => void;
     size: ActionButtonSize;
     text: string;
     color: ActionButtonColor;
+    hasRestoreButton?: boolean;
   };
 }
 
@@ -38,9 +40,24 @@ export const CustomCard: React.FC<ICustomCardProps> = ({ cardClassName, contentC
     <Card sx={{ minWidth: 275 }} className={cardClassName}>
       <CardContent className={contentClassName}>{children}</CardContent>
       <CardActions className={actionsProps.cardActionsClassName}>
-        <Button size={actionsProps.size} className={actionsProps.buttonClassName} color={actionsProps.color} onClick={actionsProps.onClick}>
+        <Button
+          size={actionsProps.size}
+          className={actionsProps.buttonClassName}
+          color={actionsProps.color}
+          onClick={actionsProps.onRemove}
+        >
           {actionsProps.text}
         </Button>
+        {actionsProps.hasRestoreButton && (
+          <Button
+            className={actionsProps.buttonClassName}
+            size={actionsProps.size}
+            color={actionsProps.color}
+            onClick={actionsProps.onRestore}
+          >
+            restore
+          </Button>
+        )}
       </CardActions>
     </Card>
   );

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useMemo, useReducer, useState } from 'react';
-import { User } from '../../interface/user.interface';
+import { IUser } from '../../interface/user.interface';
 import usersData from '../../data';
 import { makeId } from '../../utils';
 import { Box, Button, TextField } from '@mui/material';
@@ -26,12 +26,12 @@ function reducer(state: IState, action: IAction) {
 }
 
 export function Home() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<IUser[]>([]);
   const [numberInput] = useState<number>(0);
   const [text] = useState<string>('');
   const [countState, dispatch] = useReducer(reducer, { count: 0 });
-  const [removedUsers, setRemovedUsers] = useState<User[]>([]);
-  const [searchedUsers, setSearchedUsers] = useState<User[]>([]);
+  const [removedUsers, setRemovedUsers] = useState<IUser[]>([]);
+  const [searchedUsers, setSearchedUsers] = useState<IUser[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
@@ -48,21 +48,28 @@ export function Home() {
         id: makeId(6, 'ABCDEF123456'),
       }));
       const sortedUsersByAge = [...mappedUsersWithId].sort((a, b) => a.age - b.age);
-      const sortedUsersByCompanyName = [...sortedUsersByAge].sort((a, b) => {
-        const companyA = a.companyName.toUpperCase();
-        const companyB = b.companyName.toUpperCase();
-        if (companyA < companyB) return -1;
-        if (companyA > companyB) return 1;
-        return 0;
-      });
+      const sortedUsersByCompanyName = sortUsersByCompanyName([...sortedUsersByAge]);
 
       setUsers(sortedUsersByCompanyName);
     }
   }, [usersData]);
 
+  const sortUsersByCompanyName = (users: IUser[]): IUser[] => {
+    return users.sort((a, b) => {
+      const companyA = a.companyName.toUpperCase();
+      const companyB = b.companyName.toUpperCase();
+      if (companyA < companyB) return -1;
+      if (companyA > companyB) return 1;
+      return 0;
+    });
+  };
+
   const removeUser = (id: string) => {
     const newUsersState = users.filter((user) => user.id !== id);
     const removedUser = users.find((user) => user.id === id);
+    if (removedUser) {
+      removedUser.isRemoved = true;
+    }
     setUsers(newUsersState);
     if (removedUser) {
       setRemovedUsers([...removedUsers, removedUser]);
@@ -77,14 +84,26 @@ export function Home() {
       return;
     }
     const searchedUsers = users.filter((user) => user.username.trim().toLowerCase().includes(searchTerm));
+    const searchedRemovedUsers = removedUsers.filter((user) => user.username.trim().toLowerCase().includes(searchTerm));
     setSearchTerm(searchTerm);
-    setSearchedUsers(searchedUsers);
+    setSearchedUsers([...searchedUsers, ...searchedRemovedUsers]);
+  };
+
+  const restoreUser = (id: string) => {
+    const removedUser = removedUsers.find((user) => user.id === id);
+    if (removedUser) {
+      //restore user
+      removedUser.isRemoved = false;
+      const sortedUsers = sortUsersByCompanyName([...users, removedUser]);
+      //sort users as they were before
+      setUsers(sortedUsers);
+    }
   };
 
   const displayedUsers = useMemo(() => {
     if (searchTerm.length) return searchedUsers;
     return users;
-  }, [searchedUsers, users]);
+  }, [searchTerm, searchedUsers, users]);
 
   //3. Display the users' properties using a loop in the tsx, preferably in a styled "Card" form
   //    3.1. Add a "remove" button to each card - this should remove the user from the state
@@ -107,10 +126,10 @@ export function Home() {
         Search for a user
       </Box>
       <TextField defaultValue={text} style={{ display: 'block', margin: 'auto' }} onChange={searchUsers} />
-      {displayedUsers.map((user) => {
+      {displayedUsers.map((user, i) => {
         return (
-          <Box component="div" key={user.id}>
-            <UserCard user={user} onClick={removeUser} />;
+          <Box component="div" key={i}>
+            <UserCard user={user} onRemove={removeUser} onRestore={restoreUser} />;
           </Box>
         );
       })}
