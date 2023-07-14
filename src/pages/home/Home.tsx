@@ -77,16 +77,7 @@ export function Home() {
   };
 
   const searchUsers = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = e.target.value.trim().toLowerCase();
-    if (searchTerm === '') {
-      setSearchedUsers([]);
-      setSearchTerm('');
-      return;
-    }
-    const searchedUsers = users.filter((user) => user.username.trim().toLowerCase().includes(searchTerm));
-    const searchedRemovedUsers = removedUsers.filter((user) => user.username.trim().toLowerCase().includes(searchTerm));
-    setSearchTerm(searchTerm);
-    setSearchedUsers([...searchedUsers, ...searchedRemovedUsers]);
+    setSearchTerm(e.target.value.trim().toLowerCase());
   };
 
   const restoreUser = (id: string) => {
@@ -97,13 +88,20 @@ export function Home() {
       const sortedUsers = sortUsersByCompanyName([...users, removedUser]);
       //sort users as they were before
       setUsers(sortedUsers);
+      //restore removed users
+      const removedUsersChanged = removedUsers.filter((user) => user.id !== removedUser.id);
+      setRemovedUsers(removedUsersChanged);
     }
   };
 
   const displayedUsers = useMemo(() => {
-    if (searchTerm.length) return searchedUsers;
+    if (searchTerm.length) {
+      const searchedUsers = users.filter((user) => user.username.trim().toLowerCase().includes(searchTerm));
+      const searchedRemovedUsers = removedUsers.filter((user) => user.username.trim().toLowerCase().includes(searchTerm));
+      return [...searchedUsers, ...searchedRemovedUsers];
+    }
     return users;
-  }, [searchTerm, searchedUsers, users]);
+  }, [searchTerm, users, removedUsers]);
 
   //3. Display the users' properties using a loop in the tsx, preferably in a styled "Card" form
   //    3.1. Add a "remove" button to each card - this should remove the user from the state
