@@ -2,16 +2,17 @@ import * as React from 'react';
 import { User } from '../../../interface/user.interface';
 import { ActionButtonColor, ActionButtonSize, CustomCard } from '../../../components/CustomCard';
 
-export const UserCard: React.FC<{ user: User }> = ({ user: { age, username, companyName, address } }) => {
-  const onClick = () => console.log('remove me');
-
+export const UserCard: React.FC<{ user: User; onClick: (id: string) => void }> = ({
+  user: { age, username, companyName, address, id },
+  onClick,
+}) => {
   const actionsProps = {
     cardActionsClassName: 'user-card__card-actions',
     buttonClassName: 'user-card__card-actions__button',
     size: ActionButtonSize.S,
-    onClick,
+    onClick: () => onClick(id),
     color: ActionButtonColor.PR,
-    text: 'Click me',
+    text: 'remove',
   };
 
   return (

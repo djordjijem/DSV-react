@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useMemo, useReducer, useState } from 'react';
 import { User } from '../../interface/user.interface';
 import usersData from '../../data';
 import { makeId } from '../../utils';
@@ -30,6 +30,9 @@ export function Home() {
   const [numberInput] = useState<number>(0);
   const [text] = useState<string>('');
   const [countState, dispatch] = useReducer(reducer, { count: 0 });
+  const [removedUsers, setRemovedUsers] = useState<User[]>([]);
+  const [searchedUsers, setSearchedUsers] = useState<User[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
     if (usersData && usersData.length > 0) {
@@ -57,6 +60,32 @@ export function Home() {
     }
   }, [usersData]);
 
+  const removeUser = (id: string) => {
+    const newUsersState = users.filter((user) => user.id !== id);
+    const removedUser = users.find((user) => user.id === id);
+    setUsers(newUsersState);
+    if (removedUser) {
+      setRemovedUsers([...removedUsers, removedUser]);
+    }
+  };
+
+  const searchUsers = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = e.target.value.trim().toLowerCase();
+    if (searchTerm === '') {
+      setSearchedUsers([]);
+      setSearchTerm('');
+      return;
+    }
+    const searchedUsers = users.filter((user) => user.username.trim().toLowerCase().includes(searchTerm));
+    setSearchTerm(searchTerm);
+    setSearchedUsers(searchedUsers);
+  };
+
+  const displayedUsers = useMemo(() => {
+    if (searchTerm.length) return searchedUsers;
+    return users;
+  }, [searchedUsers, users]);
+
   //3. Display the users' properties using a loop in the tsx, preferably in a styled "Card" form
   //    3.1. Add a "remove" button to each card - this should remove the user from the state
   //    3.2. Store the removed users in a new state instance
@@ -77,11 +106,11 @@ export function Home() {
       <Box component="p" style={{ marginBottom: 0, marginTop: 30 }}>
         Search for a user
       </Box>
-      <TextField defaultValue={text} style={{ display: 'block', margin: 'auto' }} />
-      {users.map((user) => {
+      <TextField defaultValue={text} style={{ display: 'block', margin: 'auto' }} onChange={searchUsers} />
+      {displayedUsers.map((user) => {
         return (
           <Box component="div" key={user.id}>
-            <UserCard user={user} />;
+            <UserCard user={user} onClick={removeUser} />;
           </Box>
         );
       })}
