@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { PropsWithChildren } from 'react';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -20,6 +19,12 @@ export enum ActionButtonColor {
   INFO = 'info',
   WARN = 'warning',
 }
+
+export enum ActionButtonVariant {
+  TEXT = 'text',
+  OUTLINED = 'outlined',
+  CONTAINED = 'contained',
+}
 interface ICustomCardProps {
   cardClassName?: string;
   contentClassName?: string;
@@ -31,13 +36,16 @@ interface ICustomCardProps {
     size: ActionButtonSize;
     text: string;
     color: ActionButtonColor;
+    restoreColor: ActionButtonColor;
     hasRestoreButton?: boolean;
+    variant?: ActionButtonVariant;
   };
+  styles?: React.CSSProperties;
 }
 
-export const CustomCard: React.FC<ICustomCardProps> = ({ cardClassName, contentClassName, actionsProps, children }) => {
+export const CustomCard: React.FC<ICustomCardProps> = ({ cardClassName, contentClassName, actionsProps, children, styles }) => {
   return (
-    <Card sx={{ minWidth: 275 }} className={cardClassName}>
+    <Card sx={styles} className={cardClassName}>
       <CardContent className={contentClassName}>{children}</CardContent>
       <CardActions className={actionsProps.cardActionsClassName}>
         <Button
@@ -45,6 +53,7 @@ export const CustomCard: React.FC<ICustomCardProps> = ({ cardClassName, contentC
           className={actionsProps.buttonClassName}
           color={actionsProps.color}
           onClick={actionsProps.onRemove}
+          variant={actionsProps.variant}
         >
           {actionsProps.text}
         </Button>
@@ -52,8 +61,9 @@ export const CustomCard: React.FC<ICustomCardProps> = ({ cardClassName, contentC
           <Button
             className={actionsProps.buttonClassName}
             size={actionsProps.size}
-            color={actionsProps.color}
+            color={actionsProps.restoreColor}
             onClick={actionsProps.onRestore}
+            variant={actionsProps.variant}
           >
             restore
           </Button>

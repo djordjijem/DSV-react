@@ -70,7 +70,7 @@ describe('Home page', () => {
     const { getByTestId } = render(<Home />);
     const button = getByTestId('random-increment');
     fireEvent.click(button);
-    const count = getByTestId('count');
+    const count = getByTestId('home__count');
     const countValue = count?.textContent?.split(':')[1].trim();
     expect(parseInt(countValue || '0')).toBeGreaterThanOrEqual(2);
     expect(parseInt(countValue || '0')).toBeLessThanOrEqual(11);

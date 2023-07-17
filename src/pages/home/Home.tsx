@@ -1,9 +1,7 @@
 import * as React from 'react';
-import { useEffect, useMemo, useReducer, useState } from 'react';
+import { useMemo, useReducer, useState } from 'react';
 import { IUser } from '../../interface/user.interface';
-import usersData from '../../data';
-import { makeId } from '../../utils';
-import { Box, Button, TextField } from '@mui/material';
+import { Box, Button, Container, Grid, TextField } from '@mui/material';
 import { UserCard } from './components/UserCard';
 import { initialState, reducer } from './reducer';
 import { useUsers } from './hooks/useUsers';
@@ -63,51 +61,95 @@ export function Home() {
   }, [searchTerm, users, removedUsers]);
 
   return (
-    <div>
-      <p style={{ marginBottom: 0 }} data-testid="count">
-        Count: {countState.count}
-      </p>
-      <TextField
-        defaultValue={text}
-        type="number"
-        style={{ display: 'block' }}
-        inputProps={{ 'data-testid': 'first-input' }}
-        onChange={setInputText}
-      />
-      <Button variant="contained" onClick={() => dispatch({ type: 'decrement' })}>
-        -
-      </Button>
-      <Button variant="contained" onClick={() => dispatch({ type: 'increment' })}>
-        +
-      </Button>
-      <Box component="p" style={{ marginBottom: 0, marginTop: 30 }}>
-        Search for a user
-      </Box>
-      <Button data-testid="random-increment" onClick={() => dispatch({ type: 'incrementRandom' })}>
-        Random Increment
-      </Button>
-      <Button data-testid="next-odd" onClick={() => dispatch({ type: 'incrementToNearestOdd' })}>
-        Next odd
-      </Button>
-      <Button data-testid="decrement-by-input-value" onClick={decreaseCount}>
-        Decrement by input value
-      </Button>
-      <Button data-testid="reset" onClick={() => dispatch({ type: 'reset' })}>
-        Reset count
-      </Button>
-      <TextField
-        defaultValue={searchTerm}
-        style={{ display: 'block', margin: 'auto' }}
-        onChange={searchUsers}
-        inputProps={{ 'data-testid': 'search-users-input' }}
-      />
-      {displayedUsers.map((user, i) => {
-        return (
-          <Box component="div" key={i} data-testid={user.username}>
-            <UserCard user={user} onRemove={removeUser} onRestore={restoreUser} />;
+    <Container>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Box component="div">
+            <Box component="h2" data-testid="home__count">
+              Count: {countState.count}
+            </Box>
+            <Box component="div">
+              <Box component="div">
+                <TextField
+                  id="outlined-number"
+                  label="Number"
+                  type="number"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  defaultValue={text}
+                  inputProps={{ 'data-testid': 'first-input' }}
+                  onChange={setInputText}
+                />
+              </Box>
+              <Box component="div">
+                <Button variant="outlined" onClick={() => dispatch({ type: 'decrement' })}>
+                  -
+                </Button>
+                <Button variant="contained" onClick={() => dispatch({ type: 'increment' })} sx={{ margin: '.5rem' }}>
+                  +
+                </Button>
+              </Box>
+            </Box>
+
+            <Grid container spacing={2} justifyContent="center">
+              <Grid item>
+                <Button
+                  data-testid="random-increment"
+                  onClick={() => dispatch({ type: 'incrementRandom' })}
+                  variant="outlined"
+                  color="success"
+                >
+                  Random Increment
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  data-testid="next-odd"
+                  onClick={() => dispatch({ type: 'incrementToNearestOdd' })}
+                  variant="contained"
+                  color="secondary"
+                >
+                  Next odd
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button data-testid="decrement-by-input-value" onClick={decreaseCount} variant="contained" color="error">
+                  Decrement by input value
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button data-testid="reset" onClick={() => dispatch({ type: 'reset' })} variant="contained" color="warning">
+                  Reset count
+                </Button>
+              </Grid>
+            </Grid>
           </Box>
-        );
-      })}
-    </div>
+        </Grid>
+        <Grid item xs={12}>
+          <Grid container spacing={2} justifyContent="center" flexDirection="column">
+            <TextField
+              id="outlined-textarea"
+              label="Search for a user"
+              placeholder="Search"
+              multiline
+              defaultValue={searchTerm}
+              sx={{ display: 'block', margin: 'auto', marginTop: '20px' }}
+              onChange={searchUsers}
+              inputProps={{ 'data-testid': 'search-users-input' }}
+            />
+            <Grid item container spacing={2} justifyContent="center">
+              {displayedUsers.map((user, i) => {
+                return (
+                  <Grid item component="div" key={i} data-testid={user.username}>
+                    <UserCard user={user} onRemove={removeUser} onRestore={restoreUser} />
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+    </Container>
   );
 }
