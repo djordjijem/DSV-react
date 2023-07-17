@@ -8,7 +8,6 @@ interface UserCardProps {
   hasRestoreButton?: boolean;
   onRestore: (id: string) => void;
 }
-
 export const UserCard: React.FC<UserCardProps> = ({
   user: { age, username, companyName, address, id, isRemoved },
   onRemove,
@@ -29,7 +28,8 @@ export const UserCard: React.FC<UserCardProps> = ({
     <CustomCard actionsProps={actionsProps} cardClassName="user-card" contentClassName="user-card__content">
       <p>Username: {username}</p>
       <p>Address: {`${address.street}, ${address.city}, ${address.zipcode}`}</p>
-      <p>Age: {age}</p> d<p>Company name: {companyName}</p>
+      <p>Age: {age}</p>
+      <p>Company name: {companyName}</p>
     </CustomCard>
   );
 };
